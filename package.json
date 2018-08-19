@@ -12,15 +12,19 @@
       "transform": "cube-ui/lib/${member}",
       "kebabCase": true,
       "style": {
-        "ignore": ["create-api", "better-scroll"]
+        "ignore": [
+          "create-api",
+          "better-scroll"
+        ]
       }
     }
   },
   "dependencies": {
-    "vue": "^2.5.17",
-    "vue-router": "^3.0.1",
     "axios": "^0.18.0",
-    "cube-ui": "~1.10.4"
+    "cube-ui": "~1.10.4",
+    "qs": "^6.5.2",
+    "vue": "^2.5.17",
+    "vue-router": "^3.0.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.0",

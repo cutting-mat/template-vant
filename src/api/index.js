@@ -2,9 +2,7 @@ import axios from 'axios';
 import qs from 'qs';
 import * as util from '../assets/util.js';
 
-
-//export const baseURL = 'http://rap2api.taobao.org/app/mock/21999';
-export const baseURL = 'http://xiaoqin.sooc.com';
+export const baseURL = '/';
 
 const instance = axios.create({
   baseURL: baseURL,
@@ -14,7 +12,6 @@ const instance = axios.create({
   }
 });
 
-//instance.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
 // 请求处理
 instance.interceptors.request.use(function (config) {
   if(config.data){
@@ -27,14 +24,9 @@ instance.interceptors.request.use(function (config) {
 
 //错误处理
 instance.interceptors.response.use(function(response) {
-  if(response.data.status!=200){
+  if(!response.data){
     return util.catchError({
       message: response.data.statusCode || '接口请求失败'
-    });
-  }
-  if(!response.data.data){
-    return util.catchError({
-      message: response.data.statusCode || '接口数据格式异常'
     });
   }
   return response;
