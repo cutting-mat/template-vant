@@ -1,6 +1,6 @@
 <template>
   <div>
-    <cube-button @click="$router.push({name: '空白'})">Button</cube-button>
+    index
   </div>
 </template>
 

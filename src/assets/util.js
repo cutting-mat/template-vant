@@ -1,23 +1,22 @@
 /* eslint-disable */
 import Vue from 'vue'
 
-//sessionStorage
-export const session = function(key, value){
+//localStorage
+export const storage = function(key, value) {
   if (value === void(0)) {
-    var lsVal = sessionStorage.getItem(key);
-    if(lsVal && lsVal.indexOf('autostringify-') === 0 ){
-      return JSON.parse(lsVal.split('autostringify-')[1]);
-    }else{
-      return lsVal;
-    }
-  }else {
-    if (typeof(value)==="object" || Array.isArray(value)) {
-      value = 'autostringify-' + JSON.stringify(value);
-    };
-    return sessionStorage.setItem(key, value);
+      let lsVal = localStorage.getItem(key);
+      if (lsVal && lsVal.indexOf('autostringify-') === 0) {
+          return JSON.parse(lsVal.split('autostringify-')[1]);
+      } else {
+          return lsVal;
+      }
+  } else {
+      if (typeof(value) === "object" || Array.isArray(value)) {
+          value = 'autostringify-' + JSON.stringify(value);
+      };
+      return localStorage.setItem(key, value);
   }
-} 
-
+}
 //生成随机数
 export const getUUID = function (len) {
   len = len || 6;
@@ -71,6 +70,9 @@ export const dateFormat = function(source, ignore_minute) {
 };
 //ajax错误处理
 export const catchError = function(error) {
+  if(error.data){
+    error.response = error.data
+  }
   if (error.response) {
     switch (error.response.status) {
       case 400:
@@ -82,13 +84,8 @@ export const catchError = function(error) {
         
         break;
       case 401:
-        sessionStorage.removeItem('user');
-        window.globalThis.$createToast({
-          type: "error",
-          txt: error.response.data.message || '密码错误或账号不存在！',
-          time: 1000
-        }).show();
-        
+        storage('user','');
+        window.location.reload()
         break;
       case 403:
       window.globalThis.$createToast({

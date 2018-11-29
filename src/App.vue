@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <transition :name="transitionName">
-      <keep-alive :include="['首页']">
+      <keep-alive>
       <router-view class="child-view"></router-view>
       </keep-alive>
     </transition>
@@ -56,7 +56,7 @@ export default {
           HISTORY_STACK.push(to.fullPath);
       }
 
-      util.session("HISTORY_ARRAY_STACK_LOCAL_KEY", HISTORY_STACK);
+      util.storage("HISTORY_ARRAY_STACK_LOCAL_KEY", HISTORY_STACK);
 
       // to 如果在这个列表中，始终认为是后退
       if (to.name && ALWAYS_BACK_PAGE.indexOf(to.name) !== -1) {
@@ -79,34 +79,27 @@ export default {
         return true;
 
     },
-    signin: function(localUser) {
-      //检查登录状态
-      if (!localUser) {
-        return console.warn("未登录！");
-      }
+    initUser: function(callback) {
+      this.$root.user = util.storage("user");
       //设置请求头统一携带token
-      instance.defaults.headers.common["Authorization"] = localUser;
+      instance.defaults.headers.common[
+        "Authorization"
+      ] = this.$root.user.access_token;
       //注入路由
       this.$router.addRoutes(routers.concat([{
         path: '*',
         redirect: '/404'
       }]));
-    },
-    getUserToken: function(token){
-      let vm = this;
-      if(token){
-        vm.$root.token = token;
-        vm.signin(token);
-      }else{
-        console.warn('缺少参数');
-      }
+      //执行回调
+      typeof callback === "function" && callback();
     }
   },
   created: function() {
-    if(!this.$root.token){
-      this.getUserToken('b9cdf44483f0c7e0abd51d90109d5dd1');
+    if(util.storage("user")){
+      this.initUser()
+    }else{
+      this.$router.replace('/login')
     }
-    
   }
 };
 </script>

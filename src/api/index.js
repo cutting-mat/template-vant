@@ -26,10 +26,8 @@ instance.interceptors.request.use(function (config) {
 
 //错误处理
 instance.interceptors.response.use(function(response) {
-  if(!response.data){
-    return util.catchError({
-      message: response.data.statusCode || '接口请求失败'
-    });
+  if (response.data.status != 200) {
+    return util.catchError(response);
   }
   return response;
 }, util.catchError);
