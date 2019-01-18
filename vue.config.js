@@ -10,5 +10,6 @@ module.exports = {
 		plugins: [
 			new TransformModulesPlugin()
 		]
-	}
+	},
+	productionSourceMap: false
 }
