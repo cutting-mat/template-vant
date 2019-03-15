@@ -1,7 +1,7 @@
 var TransformModulesPlugin = require('webpack-transform-modules-plugin')
 
 module.exports = {
-	configureWebpack: {
+    configureWebpack: {
 		resolve: {
 			alias: {
 				'cube-ui': 'cube-ui/lib'
@@ -11,5 +11,22 @@ module.exports = {
 			new TransformModulesPlugin()
 		]
 	},
-	productionSourceMap: false
+
+    productionSourceMap: false,
+
+    css: {
+      loaderOptions: {
+        stylus: {
+          'resolve url': true,
+          'import': []
+        }
+      }
+    },
+
+    pluginOptions: {
+      'cube-ui': {
+        postCompile: false,
+        theme: false
+      }
+    }
 }
