@@ -1,12 +1,9 @@
 import Vue from 'vue'
 import './cube-ui'
-import Cube from 'cube-ui'
 import App from './App'
 import router from './router'
 
 import {baseURL} from './api/'
-
-Vue.use(Cube)
 
 Vue.config.productionTip = false
 
