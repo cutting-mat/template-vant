@@ -4,13 +4,13 @@ import * as util from '@/common/assets/util';
 const URLHASH = {
   mock: 'http://rap2api.taobao.org/app/mock/223572',
   dev:'http://c5app.sogdata.com',
-  master: '//citicbank5c.c.citic'
+  master: '//master.com'
 };
 
 const SERVER = {
-  "c5pc.sogdata.com": URLHASH.dev,
-  "c5pc.demo": URLHASH.demo,
-  "bank5c.c.citic" : URLHASH.master
+  "dev.com": URLHASH.dev,
+  "demo.demo": URLHASH.demo,
+  "master.com" : URLHASH.master
 }
 
 export const baseURL = SERVER[window.location.host] || URLHASH.dev;
