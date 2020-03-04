@@ -1,14 +1,13 @@
 <template>
-  <div class="placeholder">
-    <div style="padding:1rem">
-      暂无数据
-    </div>
+  <div>
+    blank
   </div>
 </template>
 
 <script>
+//import * as util from '@/common/assets/util';
+
 export default {
-  name: 'placeholder',
   data () {
     return {
       
@@ -16,11 +15,13 @@ export default {
   },
   methods: {
     
+  },
+  created: function(){
+    
   }
 }
 </script>
 
 <style scoped>
-.placeholder{ text-align: center;}
 
 </style>

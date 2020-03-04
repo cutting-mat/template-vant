@@ -1,50 +1,38 @@
+// 根据package.json [browserslist]配置加载polyfill，需同时替换babel.config.js中注释的presets配置
+import '@babel/polyfill'
+
 import Vue from 'vue'
-import './cube-ui'
-import App from './App'
+import Vant from 'vant';
+import 'vant/lib/index.css';
+
+Vue.use(Vant);
+// 注册全局资源
+import register from '@/register'
+Vue.use(register);
+
+// 加载路由
 import router from './router'
 
-import {baseURL} from './api/'
+/*
+* 注册 v-has 指令（权限控制）
+*/
 
-Vue.config.productionTip = false
-
-router.beforeEach((to, from, next) => {
-  if(to.name){
-    document.title = to.name;
+Vue.directive('has', {
+  inserted: function(el, binding) {
+    if (Vue.prototype.$_has && !Vue.prototype.$_has(binding.value)) {
+      el.parentNode.removeChild(el);
+    }
   }
-  next()
-})
+});
 
-/* eslint-disable no-new */
-window.globalThis = new Vue({
-  el: '#app',
+import App from './App.vue'
+
+new Vue({
   data(){
     return {
-      loading: this.$createToast({
-        txt: 'Loading...',
-        time: 10000,
-        mask: true
-      }),
-      token: null,
-      uploadAction: {
-        target: `${baseURL}/index.php/api/file/upload`,
-        headers: {
-          Authorization: null
-        }
-      }
-    }
-  },
-  watch: {
-    token: function(newToken){
-      if(newToken){
-        this.uploadAction.headers.Authorization = newToken;
-      }
+      AccessControl: false
     }
   },
   router,
   render: h => h(App)
-})
-
-// 异常处理
-Vue.config.errorHandler = function (err, vm, info) {
-  console.warn(err, info)
-}
+}).$mount('#app')

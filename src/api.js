@@ -1,13 +1,19 @@
 import axios from 'axios';
-import * as util from '../assets/util.js';
+import * as util from '@/common/assets/util';
 
 const URLHASH = {
-  mock: 'http://rap2api.taobao.org/app/mock/3567',
-  dev: 'http://view.sooc.com',
-  test: ''
+  mock: 'http://rap2api.taobao.org/app/mock/223572',
+  dev:'http://c5app.sogdata.com',
+  master: '//citicbank5c.c.citic'
 };
 
-export const baseURL = URLHASH.mock;
+const SERVER = {
+  "c5pc.sogdata.com": URLHASH.dev,
+  "c5pc.demo": URLHASH.demo,
+  "bank5c.c.citic" : URLHASH.master
+}
+
+export const baseURL = SERVER[window.location.host] || URLHASH.dev;
 
 export const instance = axios.create({
   baseURL,
@@ -26,10 +32,10 @@ instance.interceptors.request.use(function (config) {
 
 //错误处理
 instance.interceptors.response.use(function(response) {
-  if (response.data.status != 200) {
+  if(response.status!=200){
     return util.catchError(response);
   }
   return response;
-}, util.catchError);
-
-export default instance;
+}, function (error) {
+  return util.catchError(error);
+});

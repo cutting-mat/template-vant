@@ -1,18 +1,19 @@
 module.exports = {
-  css: {
-    loaderOptions: {
-      stylus: {
-        'resolve url': true,
-        'import': [
-          './src/theme'
-        ]
-      }
-    }
-  },
-  pluginOptions: {
-    'cube-ui': {
-      postCompile: true,
-      theme: true
-    }
-  }
+    transpileDependencies: [],       // 需要编译的依赖包名
+    productionSourceMap: false,
+    css: {
+        sourceMap: true,
+        loaderOptions: {
+            less: {
+              modifyVars: {
+                'goods-action-button-danger-color': '#7232dd',
+                'goods-action-button-warning-color': '#3eaf7c'
+              }
+            }
+          }
+    },
+    outputDir: 'docs',
+    publicPath: process.env.NODE_ENV === 'production'
+      ? '/Vue-Scaffold-Mobile/'
+      : '/'
 }
