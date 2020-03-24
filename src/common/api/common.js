@@ -1,6 +1,5 @@
 import {
-    instance,
-    baseURL
+    instance
 } from '@/api';
 
 

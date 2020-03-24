@@ -13,7 +13,7 @@ const SERVER = {
   "master.com" : URLHASH.master
 }
 
-export const baseURL = SERVER[window.location.host] || URLHASH.dev;
+export const baseURL = SERVER[window.location.host] || URLHASH.mock;
 
 export const instance = axios.create({
   baseURL,
