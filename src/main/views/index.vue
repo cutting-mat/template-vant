@@ -2,19 +2,13 @@
   <div class="mainCont flex-col">
     <!-- 头部 -->
     <global-header />
-    <div class="flex-1 flex-row">
-      
-      <!-- 内容 -->
-      <template v-if="$route.path=='/'">
-        <dashboard class="flex-1" />
-      </template>
-      <template v-else>
-        <div class="flex-1 flex-col">
-
-          <router-view class="flex-1" />
-        </div>
-      </template> 
-    </div>
+    <!-- 内容 -->
+    <template v-if="$route.path=='/'">
+      <dashboard class="flex-1" />
+    </template>
+    <template v-else>
+      <router-view class="flex-1" />
+    </template> 
   </div>
 </template>
 
