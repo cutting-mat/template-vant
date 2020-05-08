@@ -89,7 +89,7 @@ export default {
       file.status = "done";
       file.message = "上传成功";
     },
-    handleRemove(file, fileList) {
+    handleRemove(file) {
       this.list = this.list.filter(e => {
         return e.id != file.id;
       });
