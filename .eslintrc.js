@@ -13,6 +13,7 @@ module.exports = {
   rules: {
     'no-console': 'off',
     'no-debugger': 'off',
-    'no-unused-vars': 'warn'
+    'no-unreachable': 'warn',
+    'no-unused-vars': 'warn',
   }
 }
