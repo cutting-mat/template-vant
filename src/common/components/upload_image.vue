@@ -14,7 +14,7 @@
 <script>
 import { uploadImg } from "@/common/api/common";
 import * as util from "@/common/assets/util";
-let { fixBySelector, fixImgFile } = require("ios-photo-repair")
+let { fixImgFile } = require("ios-photo-repair")
 import {store} from "@/store"
 
 export default {
