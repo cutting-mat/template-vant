@@ -14,26 +14,9 @@ Vue.use(register);
 // 加载路由
 import router from './router'
 
-/*
-* 注册 v-has 指令（权限控制）
-*/
-
-Vue.directive('has', {
-  inserted: function(el, binding) {
-    if (Vue.prototype.$_has && !Vue.prototype.$_has(binding.value)) {
-      el.parentNode.removeChild(el);
-    }
-  }
-});
-
 import App from './App.vue'
 
 new Vue({
-  data(){
-    return {
-      AccessControl: false
-    }
-  },
   router,
   render: h => h(App)
 }).$mount('#app')

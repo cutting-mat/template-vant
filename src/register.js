@@ -1,15 +1,13 @@
 // 全局组件
-import globalHeader from '@/common/components/header.vue'
 
 const globalComponents = {
-    globalHeader,
-    //globalPagination: () => import(/* webpackChunkName: "global-components" */ "@/common/components/pagination.vue"),
-    globalPlaceholder: () => import(/* webpackChunkName: "global-components" */ "@/common/components/placeholder.vue")
+    InviteDialog: () => import(/* webpackChunkName: "global-components" */ "@/main/components/InviteDialog.vue"),
+
 }
 
 
 // 全局过滤器
-import {formatDate} from '@/common/assets/util'
+import {formatDate} from '@/main/assets/util'
 
 const globalFilters = {
     date: formatDate

@@ -1,34 +1,31 @@
 <template>
   <div class="mainCont flex-col">
-    <!-- 头部 -->
-    <global-header />
-    <!-- 内容 -->
-    <template v-if="$route.path=='/'">
-      <dashboard class="flex-1" />
-    </template>
-    <template v-else>
-      <router-view class="flex-1" />
-    </template> 
+    <home class="flex-1" v-if="$route.path == '/'" />
+    <router-view class="flex-1" v-else />
   </div>
 </template>
 
 <script>
+import { getUrlParam } from "@/main/assets/util.js";
+import vconsole from "vconsole";
+const console = getUrlParam("console");
+if (console) {
+  new vconsole();
+}
 
 export default {
   components: {
-    dashboard: () => import("../components/dashboard.vue")
+    home: () => import("../components/home.vue"),
   },
-  data () {
-    return {
-      
-    }
+  data() {
+    return {};
   },
-  methods: {
-    
-  }
+  methods: {},
 };
 </script>
 
-<style scoped>
-.mainCont{background:#f5f5f5;}
+<style>
+.mainCont {
+  background: #f2f5f9;
+}
 </style>

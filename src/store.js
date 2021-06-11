@@ -1,7 +1,7 @@
 import Vue from 'vue'
 const bus = new Vue();
-import * as util from "@/common/assets/util";
-
+import * as util from "@/main/assets/util";
+import { permission as getUserPermission, info as getUserInfo } from "@/user/api/user";
 // 队列容器
 let promiseQueue = {};
 
@@ -13,11 +13,12 @@ export const store = {
         menu: [], // 导航菜单
         user: {}, // 用户信息
         isCollapse: false, // 菜单收起状态 
-        permission: [] // 用户权限
+        permission: [], // 用户权限
+        showQrcode: false,              // 邀请二维码字符
     },
     set(key, newValue) {
         return new Promise((resolve, reject) => {
-            if (this.state[key] !== void(0)) {
+            if (this.state[key] !== void (0)) {
                 this.state[key] = newValue;
 
                 this.debug && console.log('store update:', key, '=>', this.state[key])
@@ -28,16 +29,20 @@ export const store = {
         })
     },
     get(key) {
-        if(key && key.split){
-            if (this.state[key] === void(0)) {
+        if (key && key.split) {
+            if (this.state[key] === void (0)) {
                 util.warn(`key [${key}] is not register in store!`)
             }
             return this.state[key]
         }
     },
-    checkStore(key, type) {
+    checkStore(key) {
         let result;
-        type = type || 'array'; // array,object,number,string,boolean
+        let type = typeof (this.state[key]); // array,object,number,string,boolean
+        if (Array.isArray(this.state[key])) {
+            type = 'array'
+        }
+
         switch (type) {
             case 'array':
                 result = !!this.state[key].length
@@ -50,38 +55,52 @@ export const store = {
         }
         return result
     },
-    action(key, type) {
+    action(key, reload) {
         return new Promise((resolve, reject) => {
             // 异步数据处理方法
             const catchActionData = (data) => {
-                if(promiseQueue[key]){
+                if (promiseQueue[key]) {
                     bus.$emit(promiseQueue[key], data)
                     this.set(key, data)
                     resolve(data)
                     delete promiseQueue[key];
                 }
             }
-            if (this.checkStore(key, type)) {
+            if (!reload && this.checkStore(key)) {
                 resolve(this.state[key])
             } else {
                 // 检测并加入队列
-                if(promiseQueue[key]){
+                if (promiseQueue[key]) {
                     bus.$once(promiseQueue[key], (data) => {
                         resolve(data)
                     })
-                }else{
+                } else {
                     // 创建队列
                     promiseQueue[key] = 'action_' + parseInt(Math.random() * 1e8);
                     // 定义异步数据获取逻辑
                     switch (key) {
+                        case "permission":
+                            getUserPermission().then(res => {
+                                let userPermissions = {
+                                    menus: res.data.data.filter((e) => e.type === 0),
+                                    resources: res.data.data.filter((e) => e.type === 1),
+                                };
+                                catchActionData(userPermissions)
+                            })
+                            break;
+                        case "user":
+                            getUserInfo().then(res => {
+                                catchActionData(res.data.data)
+                            })
+                            break;
                         case "someKey":
                             // send ajax and use `catchActionData()` to catch data!
-                            
+
                             // fetchSomeKey().then(res => {
                             //     catchActionData(res.data)
                             // })
                             break;
-                        
+
                         default:
                             reject(`key [${key}] has not define an action!`)
                     }
@@ -92,7 +111,7 @@ export const store = {
 }
 
 // 控制台查看工具
-if(store.debug){
+if (store.debug) {
     window.store = {
         list() {
             return JSON.parse(JSON.stringify(store.state))

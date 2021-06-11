@@ -3,8 +3,7 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
-import routes from '@/common'
-
+import routes from '@/main/index'
 const route = new Router({
   routes
 });
