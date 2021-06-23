@@ -89,8 +89,7 @@ export default {
 
 <style scoped>
 .loginPage {
-  background: url(../assets/img/login_b.png) right bottom no-repeat #fff;
-  background-size: 85% auto;
+  background: #fff;
 }
 .loginPage .van-cell{
   padding: 16px;

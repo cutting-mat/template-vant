@@ -10,7 +10,6 @@
 import * as util from "@/main/assets/util.js";
 import { store } from "@/store";
 import { instance } from "@/api";
-
 /**
  * to 如果在这个列表中，始终采用从左到右的滑动效果，首页比较适合用这种方式
  *
@@ -89,43 +88,26 @@ export default {
     },
     
     signin: function (callback) {
-      // 接受url授权
-      const url_token = util.getUrlParam('token');
-      if(url_token){
-        util.storage("auth", {accessToken: url_token});
-        util.storage("is_webview", 1);
-      }
+      
       /*
        * Step 1
-       * Check whether the user has access
+       * 检查用户登录状态
        */
-
-      let localUser = util.storage("auth") || {};
-      // if (!localUser || !localUser.accessToken) {
-      //   return vm.$router.push({
-      //     path: "/login",
-      //     query: { from: vm.$router.currentRoute.fullPath }
-      //   });
-      // }
-
-      /*
-       * Step 2
-       * Set Authorization
-       */
-
-      instance.defaults.headers.common["Authorization"] =
-        localUser.accessToken || "";
-      // Update token info
-      store.set("accessToken", localUser.accessToken || "");
-
+      if (store.get("accessToken")) {
+        // 已登录
+        instance.defaults.headers.common["Authorization"] =store.get("accessToken");
+      } else {
+        return console.warn('未登录')
+      }
+      
       typeof callback === "function" && callback();
     },
-    loginDirect: function (res) {
+    handleLogin: function (res) {
       /*
-       * Monitor login events
-       * Will trigger the events in views/login.vue
+       * 监听 "login" 事件
        */
       util.storage("auth", res.data);
+      store.set("accessToken", res.data.accessToken)
 
       this.signin(() => {
         // 登录成功（silent来自token续签）
@@ -134,15 +116,13 @@ export default {
         }
       });
     },
-    logoutDirect: function () {
+    handleLogout: function () {
       /*
-       * Monitor logout events
-       * Will trigger the events in views/index.vue
+       * 监听 "logout" 事件
        */
 
       util.storage("auth", "");
-
-      window.location.href = process.env.BASE_URL || "/";
+      window.location.reload()
     },
     initUser: function (loginRes) {
       if (store.get("accessToken")) {
@@ -162,32 +142,12 @@ export default {
     this.signin(this.initUser);
 
     // global event
-    util.on("login", this.loginDirect);
-    util.on("logout", this.logoutDirect);
+    util.on("login", this.handleLogin);
+    util.on("logout", this.handleLogout);
   },
 };
 </script>
 
 <style>
-@import url(main/assets/style.css);
-/* 动画 */
-.child-view {
-  position: absolute;
-  transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-}
-.slide-left-enter,
-.slide-right-leave-active {
-  opacity: 0;
-  -webkit-transform: translate(30px, 0);
-  transform: translate(30px, 0);
-}
-.slide-left-leave-active,
-.slide-right-enter {
-  opacity: 0;
-  -webkit-transform: translate(-30px, 0);
-  transform: translate(-30px, 0);
-}
+@import url(main/assets/global.css);
 </style>

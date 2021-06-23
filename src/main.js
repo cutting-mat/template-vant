@@ -3,10 +3,12 @@
 // import 'regenerator-runtime/runtime';
 
 import Vue from 'vue'
+
+// UI库
 import Vant from 'vant';
 import 'vant/lib/index.css';
-
 Vue.use(Vant);
+
 // 注册全局资源
 import register from '@/register'
 Vue.use(register);

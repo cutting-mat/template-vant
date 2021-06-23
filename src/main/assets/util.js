@@ -1,12 +1,14 @@
-/* eslint-disable */
 import Vue from 'vue'
 
-/*
+/**
  * 本地存储
- */
+ * @param key[String] 要存/取的键
+ * @param value[any] 要存的值
+ * @return 只传key会返回该key的值
+ * */
 export const storage = function (key, value) {
     const store = localStorage;
-
+    key = `${process.env.VUE_APP_STORAGE_SPACE || process.env.BASE_URL}_${key}`;           // 防止项目之间存储混淆
     if (value === void (0)) {
         let lsVal = store.getItem(key);
         if (lsVal && lsVal.indexOf('autostringify-') === 0) {
@@ -15,16 +17,18 @@ export const storage = function (key, value) {
             return lsVal;
         }
     } else {
-        if (typeof (value) === "object" || Array.isArray(value)) {
+        if ((Object.prototype.toString.call(value) === '[object Object]') || Array.isArray(value)) {
             value = 'autostringify-' + JSON.stringify(value);
-        };
+        }
         return store.setItem(key, value);
     }
 }
 
-/*
+/**
  * 深拷贝
- */
+ * @param source[Object] 要拷贝的对象
+ * @return 深拷贝后的对象
+ * */
 export const deepcopy = function (source) {
     if (!source) {
         return source;
@@ -36,24 +40,27 @@ export const deepcopy = function (source) {
     return sourceCopy;
 };
 
-/*
- * 一维数组转树形结构
- */
-export const buildTree = function (array, ckey) {
+/**
+ * 一维对象数组转树形结构
+ * @param array[对象数组] 对象数组中的对象必须包含id和[parentKey]键，如{id: 1, pid: 0}，pid值为假或等于自身id，则判定为一级节点
+ * @param parentKey[String]
+ * @return 由children键建立层级的对象数组
+ * */
+export const buildTree = function (array, parentKey) {
     let menuData = [];
     let indexKeys = Array.isArray(array) ? array.map((e) => {
         return e.id
     }) : [];
-    ckey = ckey || 'pid';
+    parentKey = parentKey || 'pid';
     array.forEach(function (e) {
-        //一级菜单
-        if (!e[ckey] || (e[ckey] === e.id)) {
-            delete e[ckey];
+        //一级节点
+        if (!e[parentKey] || (e[parentKey] === e.id)) {
+            delete e[parentKey];
             menuData.push(deepcopy(e)); //深拷贝
         } else if (Array.isArray(indexKeys)) {
-            //检测ckey有效性
+            //检测parentKey有效性
             let parentIndex = indexKeys.findIndex(function (id) {
-                return id == e[ckey];
+                return id == e[parentKey];
             });
             if (parentIndex === -1) {
                 menuData.push(deepcopy(e));
@@ -64,7 +71,7 @@ export const buildTree = function (array, ckey) {
         if (Array.isArray(parentArr) && parentArr.length) {
             parentArr.forEach(function (parentNode) {
                 array.forEach(function (node) {
-                    if (parentNode.id === node[ckey]) {
+                    if (parentNode.id === node[parentKey]) {
                         if (parentNode.children) {
                             parentNode.children.push(deepcopy(node));
                         } else {
@@ -82,9 +89,12 @@ export const buildTree = function (array, ckey) {
     return menuData;
 }
 
-/*
+/**
  * 日期格式化
- */
+ * @param value[milliseconds/dateString] 可以通过new Date()方法创建日期对象的毫秒数或日期字符串
+ * @param fmt[String/undefined] 日期格式化模板字符串，内置四种快捷方式："year","month","day",undefined 
+ * @return 格式化后的日期字符串
+ * */
 export const formatDate = (value, fmt) => {
     if (!value) {
         return null
@@ -128,36 +138,49 @@ export const formatDate = (value, fmt) => {
     return fmt
 }
 
-/*
+/**
  * 全局事件
- */
+ * 特性：
+ * 1. 重复注册同一个事件，只保留最后一次。使单页面应用反复进入页面不会重复注册事件
+ * 2. 可以通过别名方式将一个事件多次注册。在1的前提下允许同一个事件多次注册
+*/
 const bus = new Vue();
 let busQueue = {};
-//监听事件
+/**
+ * 全局事件监听
+ * @param eventName[String] 自定义事件名称，支持用双下划线添加别名，如 eventName__ANYSTRING
+ * @param eventHandle[Function] 事件回调方法，参数接收触发事件方法发送的参数；如果不传将关闭该事件监听
+*/
 export const on = function (eventName, eventHandle) {
-    if (eventName && (typeof eventHandle === 'function')) {
+    if (eventName && eventName.split) {
         if (busQueue[eventName]) {
             bus.$off(eventName, busQueue[eventName])
         }
-        busQueue[eventName] = eventHandle;
-        return bus.$on(eventName, eventHandle)
+        if (typeof eventHandle === 'function') {
+            busQueue[eventName] = eventHandle;
+            return bus.$on(eventName, eventHandle)
+        }
     }
 };
-//触发事件
+/**
+ * 全局事件触发
+ * @param eventName[String] 要触发的事件名称，不需要包含别名部分，如 myEvent__1，只需要传入 myEvent
+ * @param msg[any] 触发事件携带的参数
+*/
 export const emit = function (eventName, msg) {
-    // eventName 或者 eventName__fix 都会触发
     const busQueueKeys = Object.keys(busQueue);
     busQueueKeys.forEach(key => {
         if (eventName === key.split('__')[0]) {
-            console.log(key, eventName)
             return bus.$emit(key, msg)
         }
     })
 };
 
-/*
+/**
  * ajax错误处理
- */
+ * @param error[axios正常或异常返回数据] 所有服务器捕获的错误，约定返回数据中用msg字段携带错误信息；
+ * @return 401状态码会触发登出操作，其他异常状态码只做提醒
+*/
 export const catchError = function (error) {
     //业务代码拦截
     if (error.data) {
@@ -212,12 +235,11 @@ export const catchError = function (error) {
     return Promise.reject(error);
 }
 
-// filePreview 预览
-export const filePreview = (item) => {
-    window.open(item.url)
-}
-
-// 获取扩展名
+/**
+ * 获取扩展名
+ * @param filename[String] 要提取扩展名的字符串
+ * @return 转小写后的扩展名字符串
+*/
 export const getSuffix = (filename) => {
     let pos = filename.lastIndexOf('.')
     let suffix = ''
@@ -227,28 +249,14 @@ export const getSuffix = (filename) => {
     return suffix.toLowerCase();
 }
 
-// 非生产环境日志
-export const log = function () {
-    if (process.env.NODE_ENV !== 'production') {
-        console.log.call(this, ...arguments)
-    }
-}
-export const warn = function () {
-    if (process.env.NODE_ENV !== 'production') {
-        console.warn.call(this, ...arguments)
-    }
-}
-export const error = function () {
-    if (process.env.NODE_ENV !== 'production') {
-        console.error.call(this, ...arguments)
-    }
-}
-
-
-/*
+/**
  * 函数节流
- * @method: 函数体; @delay: 过滤执行间隔; @duration: 至少执行一次的间隔
- */
+ * @param method[Function] 要节流的函数方法
+ * @param delay[Number] 过滤执行的间隔毫秒数 
+ * @param duration 至少执行一次的间隔毫秒数 
+ * @return 具有节流特性的新函数
+*/
+
 export const throttle = function throttle(method, delay, duration) {
     let timer = null,
         begin = new Date();
@@ -270,17 +278,84 @@ export const throttle = function throttle(method, delay, duration) {
     };
 };
 
-// 验证手机号正则
-export const validMobile = /^1[0-9]{10}$/;
-/*
- * 获取url参数
- */
-export const getUrlParam = function (name, url) {
-    var urlParamReg = new RegExp("(^|&)" + name + "=([^&#]*)", "i");
-    var s = (url ? url : window.location.href).split('?')[1] || '';
-    var r = s.match(urlParamReg);
-    if (r !== null) {
-        return decodeURI(r[2]);
+/**
+ * 获取url中的query参数值
+ * @param keyName[String] 要获取的参数名
+ * @param url[String] 目标url，默认当前窗口url
+ * @return keyName参数的值
+*/
+export const getUrlParam = function (keyName, url) {
+    if (keyName && keyName.split) {
+        var urlParamReg = new RegExp("(^|&)" + keyName + "=([^&#]*)", "i");
+        var s = (url ? url : window.location.href).split('?')[1] || '';
+        var r = s.match(urlParamReg);
+        if (r !== null) {
+            return decodeURI(r[2]);
+        }
     }
+
     return null;
 };
+
+/**
+ * 从axios请求函数中提取请求信息
+ * @param axiosRequest[Function] axios请求方法
+ * @return 请求信息字符串，例如 'get,/url1'
+ * */ 
+export const matchRequest = function(axiosRequest) {
+    let result = null;
+    if(typeof axiosRequest === 'function'){
+        let regex = new RegExp(/\.([^(]+)\("([^"]+)"/); // 匹配请求函数：instance.post("/org", params)
+        result = axiosRequest.toString().match(regex);
+        if(result && result.length > 2){
+            result = [result[1], result[2]].join(",")
+        }
+    }
+    return result
+}
+
+/**
+ * 为axios扩展请求缓存功能
+ * @param axiosRequest[Function] axios请求方法
+ * @param params[Object] axios请求参数
+ * @param opt[Object] 扩展配置，默认值{cache: false}
+ * @return 携带请求响应的Promse对象
+ * */ 
+ let responseCache = {};
+ let requestQueue= {}
+export const requestWrapper = function(axiosRequest, params, opt) {
+    opt = Object.assign({
+        cache: false
+    }, opt || {})
+    let requestStr = matchRequest(axiosRequest)
+    if(!requestStr){
+        return console.warn('requestWrapper解析失败：', axiosRequest)
+    }
+    let paramsStr =  (Object.prototype.toString.call(params) === '[object Object]') ? JSON.stringify(params) : ''
+    let requestKey = (`request_${requestStr}?${paramsStr}`)
+    return new Promise((resolve, reject) => {
+        if(requestQueue[requestKey]){
+            //console.log('并发情况，无条件等待缓存')
+            bus.$once(requestKey, res => {
+                resolve(res)
+            })
+        }else{
+            if(opt.cache && responseCache[requestKey]){
+                //console.log('希望缓存且有缓存')
+                resolve(responseCache[requestKey])
+            }else{
+                //console.log('无需缓存或无缓存')
+                requestQueue[requestKey] = true;
+                return axiosRequest(params).then(res => {
+                    responseCache[requestKey] = res;
+                    resolve(res)
+                    bus.$emit(requestKey, responseCache[requestKey])
+                    delete requestQueue[requestKey]
+                }).catch(err => {
+                    delete requestQueue[requestKey]
+                    reject(err)
+                })
+            }
+        }
+    })
+}

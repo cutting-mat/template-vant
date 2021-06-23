@@ -1,10 +1,7 @@
 // 全局组件
-
 const globalComponents = {
-    InviteDialog: () => import(/* webpackChunkName: "global-components" */ "@/main/components/InviteDialog.vue"),
 
 }
-
 
 // 全局过滤器
 import {formatDate} from '@/main/assets/util'

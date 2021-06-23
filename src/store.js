@@ -1,37 +1,29 @@
-import Vue from 'vue'
-const bus = new Vue();
-import * as util from "@/main/assets/util";
 import { permission as getUserPermission, info as getUserInfo } from "@/user/api/user";
-// 队列容器
-let promiseQueue = {};
-
 
 export const store = {
-    debug: process.env.NODE_ENV!=='production',
     state: {
         accessToken: null, // token
         menu: [], // 导航菜单
         user: {}, // 用户信息
-        isCollapse: false, // 菜单收起状态 
-        permission: [], // 用户权限
-        showQrcode: false,              // 邀请二维码字符
+        permission: [] // 用户权限
     },
     set(key, newValue) {
         return new Promise((resolve, reject) => {
-            if (this.state[key] !== void (0)) {
+            if(newValue === void(0)){
+                reject(`store.set("${key}", value): value cound not be undefined!`)
+            }else if (this.state[key] !== void (0)) {
                 this.state[key] = newValue;
-
-                this.debug && console.log('store update:', key, '=>', this.state[key])
+                console.log('store update:', key, '=>', this.state[key])
                 resolve(true)
             } else {
-                reject(`this key [${key}] is not register in store!`)
+                reject(`store.set("${key}", value): key is not register in store!`)
             }
         })
     },
     get(key) {
         if (key && key.split) {
             if (this.state[key] === void (0)) {
-                util.warn(`key [${key}] is not register in store!`)
+                console.warn(`store.get("${key}"): key is not register in store!`)
             }
             return this.state[key]
         }
@@ -59,62 +51,44 @@ export const store = {
         return new Promise((resolve, reject) => {
             // 异步数据处理方法
             const catchActionData = (data) => {
-                if (promiseQueue[key]) {
-                    bus.$emit(promiseQueue[key], data)
-                    this.set(key, data)
-                    resolve(data)
-                    delete promiseQueue[key];
-                }
+                this.set(key, data)
+                resolve(data)
             }
             if (!reload && this.checkStore(key)) {
+                // 缓存命中直接返回结果
                 resolve(this.state[key])
             } else {
-                // 检测并加入队列
-                if (promiseQueue[key]) {
-                    bus.$once(promiseQueue[key], (data) => {
-                        resolve(data)
-                    })
-                } else {
-                    // 创建队列
-                    promiseQueue[key] = 'action_' + parseInt(Math.random() * 1e8);
-                    // 定义异步数据获取逻辑
-                    switch (key) {
-                        case "permission":
-                            getUserPermission().then(res => {
-                                let userPermissions = {
-                                    menus: res.data.data.filter((e) => e.type === 0),
-                                    resources: res.data.data.filter((e) => e.type === 1),
-                                };
-                                catchActionData(userPermissions)
-                            })
-                            break;
-                        case "user":
-                            getUserInfo().then(res => {
-                                catchActionData(res.data.data)
-                            })
-                            break;
-                        case "someKey":
-                            // send ajax and use `catchActionData()` to catch data!
+                switch (key) {
+                    case "permission":
+                        getUserPermission(null, {
+                            cache: !reload
+                        }).then(res => {
+                            let userPermissions = {
+                                menus: res.data.data.filter((e) => e.type === 0),
+                                resources: res.data.data.filter((e) => e.type === 1),
+                            };
+                            catchActionData(userPermissions)
+                        })
+                        break;
+                    case "user":
+                        getUserInfo(null, {
+                            cache: !reload
+                        }).then(res => {
+                            catchActionData(res.data.data)
+                        })
+                        break;
+                    case "someKey":
+                        // send ajax and use `catchActionData()` to catch data!
 
-                            // fetchSomeKey().then(res => {
-                            //     catchActionData(res.data)
-                            // })
-                            break;
+                        // fetchSomeKey().then(res => {
+                        //     catchActionData(res.data)
+                        // })
+                        break;
 
-                        default:
-                            reject(`key [${key}] has not define an action!`)
-                    }
+                    default:
+                        reject(`store.action("${key}", ${reload}): action is not define!`)
                 }
             }
         })
-    }
-}
-
-// 控制台查看工具
-if (store.debug) {
-    window.store = {
-        list() {
-            return JSON.parse(JSON.stringify(store.state))
-        }
     }
 }

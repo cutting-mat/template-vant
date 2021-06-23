@@ -1,29 +1,21 @@
 import axios from 'axios';
 import * as util from '@/main/assets/util';
-
-const HOST = {
-    mock: 'http://rap2.sogdata.com:38080/app/mock/31',
+// 环境配置
+const ENVIRONMENT = {
+    mock: 'http://rap2api.taobao.org/app/mock/223572',
     dev: 'http://zjsz.kaifa/japi',
-    test: 'http://zjsz.ceshi/japi',
-    bench: 'http://zjsz.bench/japi',
-    beta:'http://zjszbeta.sogdata.com/japi',
-    backup: '//zjsz.sogdata.com/japi',
-    demo: '//demo.shijianyuren.cn/japi',
-    master: '//www.shijianyuren.cn/japi'
+    test: 'http://test.com/api',
+    master: '//master.com/api'
 };
 
-const HASH = { 
-    "zjsz.kaifa": HOST.dev,
-    "zjsz.ceshi": HOST.test,
-    "zjsz.bench": HOST.bench,
-    "zjszbeta.sogdata.com":HOST.beta,
-    "zjsz.sogdata.com": HOST.backup,
-    "demo.shijianyuren.cn": HOST.demo,
-    "shijianyuren.cn": HOST.master,
-    "www.shijianyuren.cn": HOST.master
+const HASH = {
+    "dev.com": ENVIRONMENT.dev,
+    "test.com": ENVIRONMENT.test,
+    "master.com": ENVIRONMENT.master
 }
-export const baseURL = HASH[window.location.host] || HOST.dev;
 
+export const baseURL = HASH[window.location.host] || ENVIRONMENT.dev;
+// 统一请求实例
 export const instance = axios.create({
     baseURL,
     timeout: 10000,
@@ -32,9 +24,10 @@ export const instance = axios.create({
     }
 });
 
-// 请求处理
+// 请求前处理
 instance.interceptors.request.use(function (config) {
     if(config.method==='get' || config.method==='delete'){
+        // 过滤get和delete请求中的空字符参数
         for(let x in config.params){
             if(config.params[x]===''){
                 config.params[x] = null
@@ -47,7 +40,7 @@ instance.interceptors.request.use(function (config) {
     return Promise.reject(error);
 });
 
-// 响应处理
+// 响应后处理
 instance.interceptors.response.use(function (response) {
     if (response.status != 200) {
         return util.catchError(response);
@@ -56,8 +49,9 @@ instance.interceptors.response.use(function (response) {
         // 业务失败抛错
         return util.catchError({response})
     }
-    // token续期
+    
     if (response.headers['jwt-update-token']) {
+        // token临近过期，后端重新签发token
         util.emit('login', {
             silent: true,
             data: {

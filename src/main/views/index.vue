@@ -24,7 +24,8 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+@import url(../assets/style.css);
 .mainCont {
   background: #f2f5f9;
 }
