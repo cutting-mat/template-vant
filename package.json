@@ -10,7 +10,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "ios-photo-repair": "^1.0.9",
-    "vant": "^2.12.25",
+    "vant": "^2.12.27",
     "vue": "^2.6.14",
     "vue-router": "^3.5.2"
   },
