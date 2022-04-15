@@ -9,9 +9,9 @@
   },
   "dependencies": {
     "@cutting-mat/axios": "^1.1.4",
-    "@cutting-mat/vue-store": "^3.0.0",
+    "@cutting-mat/vue-store": "^3.0.1",
     "tiny-emitter": "^2.1.0",
-    "vant": "^3.4.7",
+    "vant": "^4.0.0-alpha.1",
     "vue": "^3.2.33",
     "vue-router": "^4.0.14"
   },

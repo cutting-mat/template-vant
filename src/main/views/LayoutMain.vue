@@ -16,14 +16,6 @@ const HomePage = defineAsyncComponent(() =>
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {};
-  },
-};
-</script>
-
 <style scoped>
 @import url(../assets/style.css);
 

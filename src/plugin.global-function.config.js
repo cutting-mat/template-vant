@@ -25,7 +25,7 @@ export const components = {
  * */
  export const directives = {
     'test': {
-        inserted(el) {
+        mounted(el) {
             setTimeout(() => {
                 el.innerText += ' test directive inject!'
             }, 0)

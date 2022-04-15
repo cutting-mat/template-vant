@@ -199,7 +199,7 @@ export default function (app, routeInstance, interceptorsRequest) {
 
             // v-auth 指令
             app.directive('auth', {
-                inserted: function (el, binding) {
+                mounted: function (el, binding) {
                     if ($_auth(binding.value)) {
                         el.parentNode.removeChild(el);
                     }

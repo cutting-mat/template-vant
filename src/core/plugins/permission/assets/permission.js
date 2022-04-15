@@ -63,10 +63,6 @@ export default {
             }
 
             event.on("login", (res) => {
-                if (!res) {
-                    return console.log(3131221312)
-                }
-
                 /*
                  * 监听 "login" 事件
                  */

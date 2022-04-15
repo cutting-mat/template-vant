@@ -68,7 +68,7 @@ export default {
     },
   },
   components: {
-    OrgTree: (resolve) => require(["../components/OrgTree"], resolve),
+    OrgTree: () => require("../components/OrgTree"),
   },
   data() {
     return {

@@ -10,7 +10,7 @@ export default function (config) {
     console.log('[Core] Router Start.')
 
     routeInstance = createRouter({
-      scrollBehavior: () => ({ y: 0 }),
+      scrollBehavior: () => ({ top: 0 }),
       history: createWebHashHistory(),
       routes: BypassRoute
     });
