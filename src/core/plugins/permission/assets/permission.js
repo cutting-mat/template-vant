@@ -63,11 +63,14 @@ export default {
             }
 
             event.on("login", (res) => {
+                if (!res) {
+                    return console.log(3131221312)
+                }
+
                 /*
                  * 监听 "login" 事件
                  */
                 const userToken = GetTokenFromLogin(res);
-                console.log('login', res)
                 if (userToken) {
                     SetAccountToken(userToken)
                     checkAccount(res)
@@ -85,7 +88,7 @@ export default {
 
                 if (
                     routeAuthWhiteList.indexOf(
-                        "/" + this.$router.currentRoute.path.split("/")[1]
+                        "/" + this.$router.currentRoute.value.path.split("/")[1]
                     ) === -1
                 ) {
                     // 非白名单路由刷新, 触发路由守卫的未登录逻辑

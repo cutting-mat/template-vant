@@ -5,14 +5,7 @@
   <LayoutMain v-else />
 </template>
 
-<script>
+<script setup>
 import LayoutMain from "./LayoutMain.vue";
 import LayoutBlank from "./LayoutBlank.vue";
-
-export default {
-  components: {
-    LayoutMain,
-    LayoutBlank,
-  },
-};
 </script>

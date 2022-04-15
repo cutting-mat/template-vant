@@ -54,11 +54,12 @@
 import { event } from "@/core";
 import { login } from "@/main/api/common";
 import { defineAsyncComponent } from "vue";
+const inputCapthaImage = defineAsyncComponent(() =>
+  import("../components/InputCaptchaImage.vue")
+);
 export default {
   components: {
-    inputCapthaImage: defineAsyncComponent(() =>
-      import("../components/InputCaptchaImage.vue")
-    ),
+    inputCapthaImage,
   },
   data() {
     const validImage = () => {
@@ -119,10 +120,8 @@ export default {
           if (res.status === 200) {
             this.loading = false;
             // 登录后全局发布 login 事件, 将被 权限模块 接收
-            // TODO
-            console.log("publish login");
             event.emit("login", {
-              redirect: this.$router.currentRoute.query.redirect || "/",
+              redirect: this.$router.currentRoute.value.query.redirect || "/",
               data: res.data,
             });
           } else {
@@ -132,7 +131,8 @@ export default {
             });
           }
         })
-        .catch(() => {
+        .catch((err) => {
+          console.warn(err);
           this.loading = false;
         });
     },

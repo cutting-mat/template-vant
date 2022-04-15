@@ -1,44 +1,36 @@
 <template>
   <header class="flex-row align-center myheader">
     <h1 class="logo" @click="$router.push('/')">LOGO</h1>
-
-    <ul class="flex-1 navlist">
-      <li
-        v-for="(item, index) in list"
-        :key="index"
-        class="_item"
-        @click="$router.push(item)"
-      >
-        {{ (item.meta && item.meta.title) || item.name }}
-      </li>
-    </ul>
-
-    <van-dropdown
-      v-if="user && user.accountName"
-      class="userAvat"
-      trigger="click"
-      @command="handleCommand"
-    >
-      <span class="el-dropdown-link">
-        <van-avatar icon="el-icon-user-solid"></van-avatar>
-        <span class="accountName">{{ user.accountName }}</span>
-        <i class="el-icon-caret-bottom"></i>
-      </span>
-      <van-dropdown-menu slot="dropdown">
-        <van-dropdown-item command="userInfo">个人信息</van-dropdown-item>
-        <van-dropdown-item command="logout">退出登录</van-dropdown-item>
-      </van-dropdown-menu>
-    </van-dropdown>
+    <div class="flex-1">
+      <!-- center -->
+    </div>
+    <van-image
+      round
+      :src="user.avatar"
+      height="40px"
+      @click="show = true"
+    ></van-image>
+    <van-action-sheet
+      v-model:show="show"
+      :actions="actions"
+      @select="onSelect"
+    />
   </header>
 </template>
 
 <script>
 import { event } from "@/core";
+import { ref } from "vue";
+import { Dialog } from "vant";
 
 export default {
-  data() {
+  setup() {
+    const show = ref(false);
+    const actions = [{ name: "退出登录" }];
+
     return {
-      list: [],
+      show,
+      actions,
     };
   },
   computed: {
@@ -47,24 +39,24 @@ export default {
     },
   },
   methods: {
-    handleCommand: function (command) {
-      switch (command) {
-        case "userInfo":
+    onSelect(item) {
+      switch (item.name) {
+        case "个人信息":
           this.$router.push({ name: "个人信息" });
           break;
-        case "logout":
+        case "退出登录":
           this.logout();
           break;
 
         default:
           break;
       }
+      this.show = false;
     },
     logout: function () {
-      this.$confirm("确认退出?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      Dialog.confirm({
+        title: "提示",
+        message: "确认退出?",
       }).then(() => {
         event.emit("logout");
       });
@@ -85,38 +77,5 @@ export default {
 .logo {
   cursor: pointer;
   margin-right: 15px;
-}
-
-.userAvat .el-dropdown-link {
-  color: #fff;
-  cursor: pointer;
-}
-.userAvat .el-avatar {
-  vertical-align: middle;
-}
-.userAvat .accountName {
-  display: inline-block;
-  vertical-align: middle;
-  margin: 0 5px 0 10px;
-}
-
-.navlist {
-  height: 100%;
-  text-align: right;
-  padding: 0 20px;
-}
-.navlist ._item {
-  display: inline-block;
-  height: 100%;
-  line-height: 60px;
-  color: #cbe3fe;
-  cursor: pointer;
-  width: 8em;
-  text-align: center;
-  font-size: 16px;
-}
-.navlist .cur {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
 }
 </style>
