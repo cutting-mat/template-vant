@@ -1,3 +1,19 @@
+<script setup>
+import { defineAsyncComponent } from "vue";
+import { store } from "@/plugin.store.config";
+import {
+  Form as VanForm,
+  Field as VanField,
+  CellGroup as VanCellGroup,
+  Checkbox as VanCheckbox,
+  Button as VanButton,
+} from "vant";
+
+const inputCapthaImage = defineAsyncComponent(() =>
+  import("../components/InputCaptchaImage.vue")
+);
+</script>
+
 <template>
   <div class="flex-col loginPage">
     <div class="_head">
@@ -10,32 +26,29 @@
       :model="formData"
       :rules="rules"
       class="login-form flex-1"
-      @submit="login"
+      @submit="doLogin"
     >
       <h2 class="sub-title">
         <span class="_text">请登录</span>
       </h2>
-      <van-field
-        :autofocus="true"
-        label="用户名"
-        v-model="formData.account"
-        :rules="rules.account"
-      ></van-field>
-      <van-field
-        label="密码"
-        type="password"
-        v-model.trim="formData.password"
-        :rules="rules.password"
-      ></van-field>
-      <inputCapthaImage ref="validCode" />
-      <div class="_action_bar">
-        <van-checkbox
-          :value="$store.rememberLogin"
-          @change="$store.set('rememberLogin', $event)"
-          >记住我</van-checkbox
-        >
-      </div>
-      <van-cell-group>
+      <van-cell-group inset>
+        <van-field
+          :autofocus="true"
+          label="用户名"
+          v-model="formData.account"
+          :rules="rules.account"
+        ></van-field>
+        <van-field
+          label="密码"
+          type="password"
+          v-model.trim="formData.password"
+          :rules="rules.password"
+        ></van-field>
+        <inputCapthaImage ref="validCode" />
+        <div class="_action_bar">
+          <van-checkbox v-model="store.rememberLogin">记住我</van-checkbox>
+        </div>
+
         <van-button native-type="submit" block type="primary" :loading="loading"
           >登录</van-button
         >
@@ -53,14 +66,8 @@
 <script>
 import { event } from "@/core";
 import { login } from "@/main/api/common";
-import { defineAsyncComponent } from "vue";
-const inputCapthaImage = defineAsyncComponent(() =>
-  import("../components/InputCaptchaImage.vue")
-);
+
 export default {
-  components: {
-    inputCapthaImage,
-  },
   data() {
     const validImage = () => {
       return new Promise((resolve, reject) => {
@@ -109,12 +116,11 @@ export default {
     };
   },
   methods: {
-    login() {
+    doLogin() {
       if (this.loading) {
         return null;
       }
       this.loading = true;
-
       login(this.formData)
         .then((res) => {
           if (res.status === 200) {

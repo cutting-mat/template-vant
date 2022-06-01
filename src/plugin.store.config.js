@@ -57,4 +57,4 @@ export const useStore = defineStore("main", {
   },
 });
 
-export const $store = useStore(pinia);
+export const store = useStore(pinia);

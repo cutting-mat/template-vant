@@ -2,10 +2,10 @@
 import { Image as VanImage, Dialog, ActionSheet } from "vant";
 import { event } from "@/core";
 import { ref, onMounted } from "vue";
-import { $store } from "@/plugin.store.config";
+import { store } from "@/plugin.store.config";
 const show = ref(false);
 const actions = [{ name: "退出登录" }];
-$store.fetchUser();
+store.fetchUser();
 
 const onSelect = function (item) {
   switch (item.name) {
@@ -48,7 +48,7 @@ onMounted(() => {
     </div>
     <van-image
       round
-      :src="$store.user.avatar"
+      :src="store.user.avatar"
       width="40px"
       height="40px"
       @click="show = true"

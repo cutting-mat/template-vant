@@ -1,6 +1,6 @@
 // 各环境BaseURL配置
 const ENVIRONMENT = {
-  mock: "https://console-mock.apipost.cn/app/mock/project/b9b7920c-6e08-4a21-cb35-33736e292245",
+  mock: "http://yapi.smart-xwork.cn/mock/154414",
   dev: "http://retire.kaifa/japi",
   test: "http://test.com/api",
   master: "//master.com/api",

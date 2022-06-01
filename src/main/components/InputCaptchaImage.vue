@@ -1,3 +1,7 @@
+<script setup>
+import { Field as VanField } from "vant";
+</script>
+
 <template>
   <van-field
     label="验证码"

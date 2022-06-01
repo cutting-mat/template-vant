@@ -1,4 +1,4 @@
-import { $store } from "@/plugin.store.config";
+import { store } from "@/plugin.store.config";
 
 import { storage, routeGenerator } from "@/core";
 
@@ -20,7 +20,7 @@ export default {
  * @return Token[String]
  * */
 export const GetAccountToken = () => {
-  const storageFun = $store.rememberLogin ? localStorage : sessionStorage;
+  const storageFun = store.rememberLogin ? localStorage : sessionStorage;
   return storage("auth", undefined, storageFun);
 };
 
@@ -30,7 +30,7 @@ export const GetAccountToken = () => {
  * @return [Any] 存储token，可被GetAccountToken()获取
  * */
 export const SetAccountToken = (token) => {
-  const storageFun = $store.rememberLogin ? localStorage : sessionStorage;
+  const storageFun = store.rememberLogin ? localStorage : sessionStorage;
   return storage("auth", token, storageFun);
 };
 
@@ -45,14 +45,14 @@ export const GetTokenFromLogin = (res) => res.data;
  * 获取用户权限数据方法
  * @return request[Promise] 请求用户权限数据的Promise实例
  * */
-export const GetPermission = async () => await $store.fetchPermission();
+export const GetPermission = async () => await store.fetchPermission();
 
 /**
  * 获取路由权限后回调
  * @param routes[Array] 动态路由
  * @return [Any]
  * */
-export const AfterGetDynamicRoute = (routes) => ($store.DynamicRoute = routes);
+export const AfterGetDynamicRoute = (routes) => (store.DynamicRoute = routes);
 
 /**
  * 用户认证失败回调
