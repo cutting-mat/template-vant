@@ -30,7 +30,7 @@
       <inputCapthaImage ref="validCode" />
       <div class="_action_bar">
         <van-checkbox
-          :value="$store.state.rememberLogin"
+          :value="$store.rememberLogin"
           @change="$store.set('rememberLogin', $event)"
           >记住我</van-checkbox
         >

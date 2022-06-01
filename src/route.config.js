@@ -5,17 +5,10 @@
  * */
 
 // 主模块
-import main from '@/main/index'
-
+import main from "@/main/index";
 
 // 主路由
-export const MainRoute = [Object.assign({}, main[0], {
-    children: [
-
-    ]
-})];
+export const MainRoute = [];
 
 // 旁路路由
-export const BypassRoute = [
-    ...main.slice(1),
-]
+export const BypassRoute = main;

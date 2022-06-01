@@ -6,12 +6,10 @@
 export default {
   name: "CuttingMatApp",
   created: function () {
-    this.$Permission(() => {
-      // 初始化用户信息
-      this.$store.action("user", {
-        cache: "update",
-      });
+    this.$Permission((token) => {
+      console.log(token);
     });
+    // code登录
   },
 };
 </script>
